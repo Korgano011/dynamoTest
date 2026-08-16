@@ -10,14 +10,13 @@ body{
     font-family: Arial, Helvetica, sans-serif;
     width:600px;
     margin:40px auto;
-
 }
 
 a{
-	display:block;
-	margin-top:20px;
-	color:blue;
-	font-size:18px;
+    display:block;
+    margin-top:20px;
+    color:blue;
+    font-size:18px;
 }
 
 input{
@@ -40,18 +39,21 @@ button{
 </style>
 
 </head>
-<body bgcolor = "#dfe6e9">
 
-<h2>Practice Database Insert</h2>
+<body bgcolor="#dfe6e9">
+
+<h2>Practice Dynamo Database Insert</h2>
 
 <label>Name</label>
 <br>
-<input type="text" id="tname">
+<input type="text" id="name">
 <br>
+
 <label>Description</label>
 <br>
-<input type="text" id="tdesc">
+<input type="text" id="desc">
 <br>
+
 <button onclick="saveRecord()">Submit</button>
 
 <div id="result"></div>
@@ -63,36 +65,56 @@ const API_URL =
 
 async function saveRecord(){
 
-    const tname = document.getElementById("tname").value;
-    const tdesc = document.getElementById("tdesc").value;
+    const name = document.getElementById("name").value.trim();
+    const desc = document.getElementById("desc").value.trim();
+    const resultDiv = document.getElementById("result");
 
-    const response = await fetch(API_URL,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            tname:tname,
-            tdesc:tdesc
-        })
-    });
+    // Make sure both fields contain data
+    if (!name || !desc) {
+        resultDiv.innerHTML = "Please enter both a name and description.";
+        return;
+    }
 
-    const result = await response.json();
+    try {
 
-    document.getElementById("result").innerHTML =
-        "Status: " + result.Status;
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: name,
+                desc: desc
+            })
+        });
 
-// Clear the fields if the save was successful 
-document.getElementById("tname").value = "";
-document.getElementById("tdesc").value = "";
+        const result = await response.json();
 
-document.getElementById("tname").focus();
+        if (!response.ok) {
+            throw new Error(result.error || "Unable to save record");
+        }
 
+        resultDiv.innerHTML = "Status: " + result.Status;
+
+        // Clear the fields if the save was successful
+        document.getElementById("name").value = "";
+        document.getElementById("desc").value = "";
+
+        document.getElementById("name").focus();
+
+    } catch (error) {
+
+        console.error(error);
+        resultDiv.innerHTML = "Error: " + error.message;
+    }
 }
 
 </script>
 
 <a href="/index.html">Return to main page</a>
+Return to main page
+</a>
+
 <br>
 
 <h2>Click on the following emails</h2>
